@@ -1,17 +1,24 @@
+// Base URL of Geonames API
 const URL_Geonames = 'http://api.geonames.org/search?maxRows=1&username=skysign&type=json&q='
+// Base URL of pixabay API
 const URL_pixabay = 'https://pixabay.com/api/?key=23245283-3763530b0782b1941d26657dd&q='
+// Base URL of weatherbit API
 const URL_weatherbit = 'http://api.weatherbit.io/v2.0/current?key=4a6b880762a84b0c8951a100bc9d5673&city='
 
+// Handling submit from form
 const handleSubmit = async function (event) {
     event.preventDefault();
 
+    // Get city name value
     let formText = document.getElementById('name').value;
 
+    // Validate city name to check that it is consist of alphabets only.
     if (false == Client.validateCityname(formText)) {
         console.log(`formText is not valid`);
         return;
     }
 
+    // Get city name from Geonames
     let res = await getGeonames(formText)
     if (res == null)
         return;
@@ -21,12 +28,14 @@ const handleSubmit = async function (event) {
     console.log(res['geonames'][0].name);
     const cityname = res['geonames'][0].name;
 
+    // Get city image from Pixabay
     res = await getPixabay(cityname);
     console.log('done getPixabay');
     console.log(res);
     console.log(res['hits'][0].webformatURL);
     const cityimage = res['hits'][0].webformatURL;
 
+    // Get weather from Weatherbit
     res = await getWeatherbit(cityname);
     console.log('done getWeatherbit');
     console.log(res);
@@ -41,6 +50,8 @@ const handleSubmit = async function (event) {
                 cityimage:cityimage,
                 weatherDesc:weatherDesc,
                 weatherIcon:iconPath};
+
+    // Render new city with city name, image and weather
     addCity(json);
 }
 
@@ -52,13 +63,17 @@ function addCity(dt) {
 
     const cities = document.getElementById('cities');
     const city = document.createElement('div');
+    city.textAlign = 'center';
     city.innerHTML = `
+        <div class='center'>
         <p id='cityX' onclick='Client.clickX(this)'>[X]</p>
         <p>${dt.cityname}</p>
-        <p>${dt.weatherDesc} <img src='${dt.weatherIcon}' alt='weather ${dt.weatherDesc} icon'></p>
+        <p>${dt.weatherDesc}</p>
+        <p><img src='${dt.weatherIcon}' alt='weather ${dt.weatherDesc} icon'></p>
         <p>
             <img src='${dt.cityimage}' alt='picture of ${dt.cityname}'>
         </p>
+        </div>
     `;
 
     cities.appendChild(city);
